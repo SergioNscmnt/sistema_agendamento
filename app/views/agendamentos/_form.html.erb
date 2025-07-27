@@ -1,42 +1,50 @@
-<%= form_with(model: agendamento) do |form| %>
-  <% if agendamento.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(agendamento.errors.count, "error") %> prohibited this agendamento from being saved:</h2>
-
-      <ul>
-        <% agendamento.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+<div class="vh-100 d-flex justify-content-center align-items-center bg-light">
+  <div class="card shadow-lg w-100 mx-3" style="max-width: 600px;">
+    <div class="card-header bg-primary text-white text-center">
+      <h4>Cadastro de Agendamento</h4>
     </div>
-  <% end %>
+    <div class="card-body">
+      <%= form_with(model: agendamento, local: true) do |form| %>
+        <% if agendamento.errors.any? %>
+          <div class="alert alert-danger">
+            <h5><%= pluralize(agendamento.errors.count, "erro") %> impediram o salvamento:</h5>
+            <ul>
+              <% agendamento.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
 
-  <div>
-    <%= form.label :cliente_id, style: "display: block" %>
-    <%= form.text_field :cliente_id %>
-  </div>
+        <div class="mb-3">
+          <%= form.label :cliente_id, "Cliente", class: "form-label" %>
+          <%= form.collection_select :cliente_id, Cliente.all, :id, :nome, prompt: "Selecione um cliente", class: "form-select" %>
+        </div>
 
-  <div>
-    <%= form.label :funcionario_id, style: "display: block" %>
-    <%= form.text_field :funcionario_id %>
-  </div>
+        <div class="mb-3">
+          <%= form.label :funcionario_id, "Funcionário", class: "form-label" %>
+          <%= form.collection_select :funcionario_id, Funcionario.all, :id, :nome, prompt: "Selecione um funcionário", class: "form-select" %>
+        </div>
 
-  <div>
-    <%= form.label :servico_id, style: "display: block" %>
-    <%= form.text_field :servico_id %>
-  </div>
+        <div class="mb-3">
+          <%= form.label :servico_id, "Serviço", class: "form-label" %>
+          <%= form.collection_select :servico_id, Servico.all, :id, :nome, prompt: "Selecione um serviço", class: "form-select" %>
+        </div>
 
-  <div>
-    <%= form.label :horario, style: "display: block" %>
-    <%= form.datetime_field :horario %>
-  </div>
+        <div class="mb-3">
+          <%= form.label :horario, class: "form-label" %>
+          <%= form.datetime_field :horario, class: "form-control" %>
+        </div>
 
-  <div>
-    <%= form.label :status, style: "display: block" %>
-    <%= form.text_field :status %>
-  </div>
+        <div class="mb-3">
+          <%= form.label :status, class: "form-label" %>
+          <%= form.text_field :status, class: "form-control" %>
+        </div>
 
-  <div>
-    <%= form.submit %>
+        <div class="d-grid">
+          <%= form.submit "Salvar Agendamento", class: "btn btn-success" %>
+        </div>
+      <% end %>
+    </div>
   </div>
-<% end %>
+</div>

@@ -22,7 +22,8 @@
         <%= form.submit "Entrar", class: "btn btn-primary" %>
       </div>
 
-      <div class="text-center">
+      <div class="d-flex justify-content-between mt-2">
+        <%= link_to "Cadastre-se", new_usuario_registration_path, class: "text-decoration-none" %>
         <%= link_to "Esqueceu sua senha?", new_usuario_password_path, class: "text-decoration-none" %>
       </div>
     <% end %>
