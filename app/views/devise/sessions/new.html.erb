@@ -1,0 +1,30 @@
+<div class="container d-flex justify-content-center align-items-center vh-100 bg-light">
+  <div class="card shadow p-4" style="min-width: 350px;">
+    <h2 class="text-center mb-4">Barbearia do Barbeiro</h2>
+
+    <%= form_with scope: :usuario, url: usuario_session_path, local: true do |form| %>
+      <div class="mb-3">
+        <%= form.label :email, class: "form-label" %>
+        <%= form.email_field :email, class: "form-control", autofocus: true, autocomplete: "email" %>
+      </div>
+
+      <div class="mb-3">
+        <%= form.label :password, class: "form-label" %>
+        <%= form.password_field :password, class: "form-control", autocomplete: "current-password" %>
+      </div>
+
+      <div class="mb-3 form-check">
+        <%= form.check_box :remember_me, class: "form-check-input" %>
+        <%= form.label :remember_me, class: "form-check-label" %>
+      </div>
+
+      <div class="d-grid mb-3">
+        <%= form.submit "Entrar", class: "btn btn-primary" %>
+      </div>
+
+      <div class="text-center">
+        <%= link_to "Esqueceu sua senha?", new_usuario_password_path, class: "text-decoration-none" %>
+      </div>
+    <% end %>
+  </div>
+</div>

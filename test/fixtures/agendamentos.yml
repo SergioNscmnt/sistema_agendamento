@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  cliente: one
+  funcionario: one
+  servico: one
+  horario: 2025-07-27 04:27:50
+  status: MyString
+
+two:
+  cliente: two
+  funcionario: two
+  servico: two
+  horario: 2025-07-27 04:27:50
+  status: MyString
