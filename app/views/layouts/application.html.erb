@@ -27,15 +27,20 @@
       
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <%= link_to "Home", root_path, class: "nav-link" %>
-          </li>
-          <li class="nav-item">
-            <%= link_to "Agendamentos", agendamentos_path, class: "nav-link" %>
-          </li>
-          <li class="nav-item">
-            <%= link_to "Sair", destroy_usuario_session_path, method: :delete, class: "nav-link" %>
-          </li>
+          <% if usuario_signed_in? %>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle"></i>
+                <span>Logado como:</span>
+                <strong><%= current_usuario.email %></strong>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <%= link_to "Sair", destroy_usuario_session_path, method: :delete, class: "dropdown-item" %>
+                </li>
+              </ul>
+            </li>
+          <% end %>
         </ul>
       </div>
     </nav>
@@ -43,6 +48,7 @@
     <div class="container-fluid">
       <div class="row">
         <!-- Sidebar -->
+        <% if usuario_signed_in? %>
         <aside class="col-md-3 col-lg-2 bg-white border-end min-vh-100 p-3">
           <h5>Menu</h5>
           <ul class="navbar-nav ms-auto">
@@ -63,11 +69,13 @@
             </li>
           </ul>
         </aside>
-
+        <% end %>
         <!-- Main content -->
-        <main class="col-md-9 col-lg-10 p-4">
+       <main class="col-12 d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+        <div class="w-100" style="max-width: 400px;">
           <%= yield %>
-        </main>
+        </div>
+      </main>
       </div>
     </div>
 
