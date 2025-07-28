@@ -7,6 +7,89 @@ pt-BR:
         restrict_dependent_destroy:
           has_one: Não é possível excluir o registro pois existe um %{record} dependente
           has_many: Não é possível excluir o registro pois existem %{record} dependentes
+    models:
+      agendamento: "Agendamento"
+      usuario: "Usuário"
+      servico: "Serviço"
+
+    attributes:
+      agendamento:
+        cliente_id: "Cliente"
+        funcionario_id: "Funcionário"
+        servico_id: "Serviço"
+        horario: "Horário"
+        status: "Status"
+
+      usuario:
+        nome: "Nome"
+        email: "E-mail"
+        endereco: "Endereço"
+        data_nascimento: "Data de Nascimento"
+        perfil: "Perfil"
+        password: "Senha"
+        password_confirmation: "Confirmação de Senha"
+
+      servico:
+        nome: "Nome do Serviço"
+        duracao: "Duração"
+        preco: "Preço"
+
+  helpers:
+    submit:
+      new: 
+        agendamento: "Criar Agendamento"
+        usuario: "Criar Usuário"
+        servico: "Criar Serviço"
+      create:
+        agendamento: "Criar Agendamento"
+        usuario: "Criar Usuário"
+        servico: "Criar Serviço"
+      update:
+        agendamento: "Atualizar Agendamento"
+        usuario: "Atualizar Usuário"
+        servico: "Atualizar Serviço"
+      submit:
+        agendamento: "Salvar Agendamento"
+        usuario: "Salvar Usuário"
+        servico: "Salvar Serviço"
+
+  views:
+    agendamentos:
+      index:
+        title: "Lista de Agendamentos"
+      show:
+        title: "Detalhes do Agendamento"
+      new:
+        title: "Novo Agendamento"
+      edit:
+        title: "Editar Agendamento"
+      form:
+        submit: "Salvar Agendamento"
+
+    usuarios:
+      index:
+        title: "Lista de Usuários"
+      show:
+        title: "Detalhes do Usuário"
+      new:
+        title: "Novo Usuário"
+      edit:
+        title: "Editar Usuário"
+      form:
+        submit: "Salvar Usuário"
+
+    servicos:
+      index:
+        title: "Lista de Serviços"
+      show:
+        title: "Detalhes do Serviço"
+      new:
+        title: "Novo Serviço"
+      edit:
+        title: "Editar Serviço"
+      form:
+        submit: "Salvar Serviço"
+
   date:
     abbr_day_names:
     - Dom

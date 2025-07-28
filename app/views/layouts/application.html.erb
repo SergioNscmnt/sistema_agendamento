@@ -1,87 +1,98 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Sistema de Agendamento</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>Sistema de Agendamento</title>
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <%= csrf_meta_tags %>
+      <%= csp_meta_tag %>
+        
+      <!-- Bootstrap CSS -->
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+        
+      <!-- Bootstrap Icons -->
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+        
+      <!-- Select2 CSS -->
+      <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        
+      <!-- Select2 Bootstrap 5 Theme (opcional) -->
+      <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.1.2/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+        
+      <!-- Estilos da aplicação (Rails) -->
+      <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+        
+      <!-- ✅ jQuery deve vir ANTES de Select2 e SEM defer -->
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        
+      <!-- ✅ Select2 JS deve vir após jQuery -->
+      <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        
+      <!-- ✅ Importmap depois de jQuery e Select2 -->
+      <%= javascript_importmap_tags %>
+        
+      <!-- Bootstrap Bundle JS (com Popper incluído) -->
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    </head>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Bundle JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
-  </head>
-
-  <body class="bg-light">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-      <a class="navbar-brand" href="#">Barbearia do Barbeiro</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <% if usuario_signed_in? %>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-person-circle"></i>
-                <span>Logado como:</span>
-                <strong><%= current_usuario.email %></strong>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                  <%= link_to "Sair", destroy_usuario_session_path, method: :delete, class: "dropdown-item" %>
-                </li>
-              </ul>
-            </li>
-          <% end %>
-        </ul>
-      </div>
-    </nav>
-
-    <div class="container-fluid">
-      <div class="row">
-        <!-- Sidebar -->
-        <% if usuario_signed_in? %>
-        <aside class="col-md-3 col-lg-2 bg-white border-end min-vh-100 p-3">
-          <h5>Menu</h5>
+    <body class="bg-light">
+      <!-- Navbar -->
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+        <a class="navbar-brand" href="#">Barbearia do Barbeiro</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <%= link_to root_path, class: "nav-link" do %>
-                <i class="bi bi-house-door"></i> Home
-              <% end %>
-            </li>
-            <li class="nav-item">
-              <%= link_to agendamentos_path, class: "nav-link" do %>
-                <i class="bi bi-calendar-check"></i> Agendamentos
-              <% end %>
-            </li>
-            <li class="nav-item">
-              <%= link_to destroy_usuario_session_path, method: :delete, class: "nav-link" do %>
-                <i class="bi bi-box-arrow-right"></i> Sair
-              <% end %>
-            </li>
+            <% if usuario_signed_in? %>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-person-circle"></i>
+                  <strong><%= current_usuario.nome %></strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <%= link_to "Sair", destroy_usuario_session_path, method: :delete, class: "dropdown-item" %>
+                  </li>
+                </ul>
+              </li>
+            <% end %>
           </ul>
-        </aside>
-        <% end %>
-        <!-- Main content -->
-       <main class="col-12 d-flex justify-content-center align-items-center" style="min-height: 100vh;">
-        <div class="w-100" style="max-width: 400px;">
-          <%= yield %>
         </div>
-      </main>
-      </div>
-    </div>
+      </nav>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-3 mt-auto">
-      <p class="mb-0">© <%= Time.now.year %> Barbearia do Barbeiro - Todos os direitos reservados.</p>
-    </footer>
-  </body>
-</html>
+      <div class="container-fluid">
+        <div class="row">
+          <!-- Sidebar -->
+          <% if usuario_signed_in? %>
+          <aside class="col-md-3 col-lg-2 bg-white border-end min-vh-100 p-3">
+            <h5>Menu</h5>
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <%= link_to root_path, class: "nav-link" do %>
+                  <i class="bi bi-house-door"></i> Home
+                <% end %>
+              </li>
+              <li class="nav-item">
+                <%= link_to agendamentos_path, class: "nav-link" do %>
+                  <i class="bi bi-calendar-check"></i> Agendamentos
+                <% end %>
+              </li>
+            </ul>
+          </aside>
+          <% end %>
+          <!-- Main content -->
+        <main class="col-md-9 col-lg-10 py-4">
+          <div class="container">
+            <%= yield %>
+          </div>
+        </main>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="bg-dark text-white text-center py-3 mt-auto">
+        <p class="mb-0">© <%= Time.now.year %> Barbearia do Barbeiro - Todos os direitos reservados.</p>
+      </footer>
+    </body>
+  </html>

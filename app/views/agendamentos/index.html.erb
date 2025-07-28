@@ -1,14 +1,44 @@
-<p style="color: green"><%= notice %></p>
-
-<h1>Agendamentos</h1>
-
-<div id="agendamentos">
-  <% @agendamentos.each do |agendamento| %>
-    <%= render agendamento %>
-    <p>
-      <%= link_to "Show this agendamento", agendamento %>
-    </p>
+  <% if current_usuario.cliente? %>
+    <div class="d-flex justify-content-end mb-3">
+      <%= link_to "Criar Agendamento", new_agendamento_path, class: "btn btn-primary" %>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Funcionário</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @agendamentos.each do |agendamento| %>
+          <tr>
+            <td><%= l agendamento.horario.to_date %></td>
+            <td><%= agendamento.funcionario.nome %></td>
+            <td><%= formatar_status(agendamento.status) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% elsif current_usuario.funcionario? %>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Serviço</th>
+          <th>Horário</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @agendamentos.each do |agendamento| %>
+          <tr>
+            <td><%= agendamento.cliente.nome %></td>
+            <td><%= agendamento.servico.nome %></td>
+            <td><%= l agendamento.horario %></td>
+            <td><%= formatar_status(agendamento.status) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
   <% end %>
-</div>
-
-<%= link_to "New agendamento", new_agendamento_path %>

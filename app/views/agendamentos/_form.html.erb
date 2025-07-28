@@ -1,50 +1,35 @@
-<div class="vh-100 d-flex justify-content-center align-items-center bg-light">
-  <div class="card shadow-lg w-100 mx-3" style="max-width: 600px;">
-    <div class="card-header bg-primary text-white text-center">
-      <h4>Cadastro de Agendamento</h4>
+<%= form_with(model: agendamento, local: true) do |form| %>
+
+  <% if current_usuario.cliente? %>
+    <%= form.hidden_field :cliente_id, value: current_usuario.id %>
+    <div class="mb-3">
+      <label class="form-label">Cliente</label>
+      <input type="text" class="form-control" value="<%= current_usuario.nome %>" readonly>
     </div>
-    <div class="card-body">
-      <%= form_with(model: agendamento, local: true) do |form| %>
-        <% if agendamento.errors.any? %>
-          <div class="alert alert-danger">
-            <h5><%= pluralize(agendamento.errors.count, "erro") %> impediram o salvamento:</h5>
-            <ul>
-              <% agendamento.errors.full_messages.each do |msg| %>
-                <li><%= msg %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-
-        <div class="mb-3">
-          <%= form.label :cliente_id, "Cliente", class: "form-label" %>
-          <%= form.collection_select :cliente_id, Cliente.all, :id, :nome, prompt: "Selecione um cliente", class: "form-select" %>
-        </div>
-
-        <div class="mb-3">
-          <%= form.label :funcionario_id, "Funcionário", class: "form-label" %>
-          <%= form.collection_select :funcionario_id, Funcionario.all, :id, :nome, prompt: "Selecione um funcionário", class: "form-select" %>
-        </div>
-
-        <div class="mb-3">
-          <%= form.label :servico_id, "Serviço", class: "form-label" %>
-          <%= form.collection_select :servico_id, Servico.all, :id, :nome, prompt: "Selecione um serviço", class: "form-select" %>
-        </div>
-
-        <div class="mb-3">
-          <%= form.label :horario, class: "form-label" %>
-          <%= form.datetime_field :horario, class: "form-control" %>
-        </div>
-
-        <div class="mb-3">
-          <%= form.label :status, class: "form-label" %>
-          <%= form.text_field :status, class: "form-control" %>
-        </div>
-
-        <div class="d-grid">
-          <%= form.submit "Salvar Agendamento", class: "btn btn-success" %>
-        </div>
-      <% end %>
+  <% else %>
+    <div class="mb-3">
+      <%= form.label :nome_cliente_convidado, "Nome do Cliente (convidado)", class: "form-label" %>
+      <%= form.text_field :nome_cliente_convidado, class: "form-control" %>
     </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :funcionario_id, "Funcionário", class: "form-label" %>
+    <%= form.collection_select :funcionario_id, Usuario.funcionario, :id, :nome, prompt: "Selecione um funcionário", class: "form-select" %>
   </div>
-</div>
+
+  <div class="mb-3">
+    <%= form.label :horario, class: "form-label" %>
+    <%= form.datetime_field :horario, class: "form-control" %>
+  </div>
+ <!-- FALTA AJUSTAR O SELECT 2 -->
+  <div class="mb-3">
+    <%= form.collection_select :servico_id, Servico.all, :id, :nome,
+      { prompt: "Selecione um serviço" },
+      { class: "form-select", data: { controller: "select2" } } %>
+  </div>
+
+  <div class="d-grid">
+    <%= form.submit "Salvar Agendamento", class: "btn btn-success" %>
+  </div>
+<% end %>

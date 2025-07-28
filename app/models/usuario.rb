@@ -10,6 +10,18 @@ class Usuario < ApplicationRecord
 
   validates :perfil, presence: true
 
+  def cliente?
+    perfil == "cliente"
+  end
+
+  def funcionario?
+    perfil == "funcionario"
+  end
+
+  def administrador?
+    perfil == "admin"
+  end
+
   private
 
   def set_default_perfil

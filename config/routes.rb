@@ -1,7 +1,9 @@
 Rails.application.routes.draw do
   get 'home/index'
   root to: "home#index"
-  devise_for :usuario
+  devise_for :usuarios, controllers: {
+    registrations: 'usuarios/registrations'
+  }
   resources :agendamentos
   resources :servicos
   resources :funcionarios

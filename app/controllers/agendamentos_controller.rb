@@ -3,7 +3,13 @@ class AgendamentosController < ApplicationController
 
   # GET /agendamentos or /agendamentos.json
   def index
-    @agendamentos = Agendamento.all
+    if current_usuario.cliente?
+      @agendamentos = Agendamento.includes(:funcionario).where(cliente_id: current_usuario.id)
+    elsif current_usuario.funcionario?
+      @agendamentos = Agendamento.includes(:cliente, :servico).where(funcionario_id: current_usuario.id)
+    else
+      @agendamentos = Agendamento.all
+    end
   end
 
   # GET /agendamentos/1 or /agendamentos/1.json
@@ -12,7 +18,10 @@ class AgendamentosController < ApplicationController
 
   # GET /agendamentos/new
   def new
-    @agendamento = Agendamento.new
+    @agendamento = Agendamento.new    
+    if current_usuario.cliente?
+      @agendamento.cliente_id = current_usuario.id
+    end
   end
 
   # GET /agendamentos/1/edit
@@ -22,15 +31,15 @@ class AgendamentosController < ApplicationController
   # POST /agendamentos or /agendamentos.json
   def create
     @agendamento = Agendamento.new(agendamento_params)
+    
+    if current_usuario.cliente?
+      @agendamento.cliente = current_usuario
+    end
 
-    respond_to do |format|
-      if @agendamento.save
-        format.html { redirect_to @agendamento, notice: "Agendamento was successfully created." }
-        format.json { render :show, status: :created, location: @agendamento }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @agendamento.errors, status: :unprocessable_entity }
-      end
+    if @agendamento.save
+      redirect_to agendamentos_path, notice: "Agendamento criado com sucesso."
+    else
+      render :new
     end
   end
 
