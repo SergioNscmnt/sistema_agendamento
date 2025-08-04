@@ -1,98 +1,135 @@
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <title>Sistema de Agendamento</title>
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      <%= csrf_meta_tags %>
-      <%= csp_meta_tag %>
-        
-      <!-- Bootstrap CSS -->
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-        
-      <!-- Bootstrap Icons -->
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
-        
-      <!-- Select2 CSS -->
-      <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-        
-      <!-- Select2 Bootstrap 5 Theme (opcional) -->
-      <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.1.2/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
-        
-      <!-- Estilos da aplicação (Rails) -->
-      <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-        
-      <!-- ✅ jQuery deve vir ANTES de Select2 e SEM defer -->
-      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        
-      <!-- ✅ Select2 JS deve vir após jQuery -->
-      <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-        
-      <!-- ✅ Importmap depois de jQuery e Select2 -->
-      <%= javascript_importmap_tags %>
-        
-      <!-- Bootstrap Bundle JS (com Popper incluído) -->
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-    </head>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sistema de Agendamento</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
 
-    <body class="bg-light">
-      <!-- Navbar -->
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-        <a class="navbar-brand" href="#">Barbearia do Barbeiro</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
+    <link rel="preload" href="/assets/application.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+      
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+      
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+      
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+      
+    <!-- Select2 Bootstrap 5 Theme (opcional) -->
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css" rel="stylesheet">
+      
+    <!-- Estilos da aplicação (Rails) -->
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+      
+    <!-- jQuery (antes do Select2) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+      
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+      
+    <!-- Importmap (Stimulus/Turbo etc.) -->
+    <%= javascript_importmap_tags %>
+      
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  </head>
+
+  <body data-controller="dark-mode" data-dark-mode-enabled-value="<%= current_usuario&.dark_mode? %>" class=" d-flex flex-column <%= body_classes %> " style="min-height: 100vh;">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+      <a class="navbar-brand" href="#">Barbearia do Barbeiro</a>
+
+      <!-- 1) Apenas em mobile: botao offcanvas -->
+      <% if usuario_signed_in? %>
+        <button class="btn btn-outline-light d-md-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
+          <i class="bi bi-list"></i>
         </button>
-        
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <% if usuario_signed_in? %>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="bi bi-person-circle"></i>
-                  <strong><%= current_usuario.nome %></strong>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                  <li>
-                    <%= link_to "Sair", destroy_usuario_session_path, method: :delete, class: "dropdown-item" %>
-                  </li>
-                </ul>
-              </li>
-            <% end %>
-          </ul>
-        </div>
-      </nav>
+      <% end %>
+      
+      <!-- Conteúdo da navbar (desktop) -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto"></ul>
+        <div class="d-flex align-items-center">
+          <!-- Toggle Dark Mode (sempre visível) -->
+          <button type="button" class="btn btn-outline-secondary me-3" data-action="dark-mode#toggle">
+            <i data-dark-mode-target="icon" class="bi <%= current_usuario&.dark_mode? ? 'bi-eye-slash' : 'bi-eye' %>"></i>
+          </button>
 
-      <div class="container-fluid">
-        <div class="row">
-          <!-- Sidebar -->
+          <!-- Logout dropdown: só em desktop -->
           <% if usuario_signed_in? %>
-          <aside class="col-md-3 col-lg-2 bg-white border-end min-vh-100 p-3">
-            <h5>Menu</h5>
-            <ul class="navbar-nav ms-auto">
-              <li class="nav-item">
-                <%= link_to root_path, class: "nav-link" do %>
-                  <i class="bi bi-house-door"></i> Home
+            <li class="nav-item dropdown list-unstyled d-none d-md-block">
+              <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#"
+                role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <% if current_usuario.avatar.attached? %>
+                  <%= image_tag current_usuario.avatar.variant(resize_to_fill: [30,30]).processed,
+                                class: "rounded-circle", alt: current_usuario.nome %>
+                <% else %>
+                  <i class="bi bi-person-circle fs-4"></i>
                 <% end %>
-              </li>
-              <li class="nav-item">
-                <%= link_to agendamentos_path, class: "nav-link" do %>
-                  <i class="bi bi-calendar-check"></i> Agendamentos
-                <% end %>
-              </li>
-            </ul>
-          </aside>
+                <strong data-dark-mode-target="username"><%= current_usuario.nome %></strong>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><%= link_to "Sair", destroy_usuario_session_path,
+                              method: :delete, class: "dropdown-item" %></li>
+              </ul>
+            </li>
           <% end %>
-          <!-- Main content -->
-        <main class="col-md-9 col-lg-10 py-4">
-          <div class="container">
-            <%= yield %>
+        </div>
+      </div>    </nav>
+
+  <% if usuario_signed_in? %>
+    <!-- Offcanvas: só em mobile -->
+    <div class="offcanvas offcanvas-start d-md-none"
+         tabindex="-1" id="mobileSidebar"
+         data-bs-scroll="true" data-bs-backdrop="false">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body">
+        <%= render "shared/sidebar_links" %>
+        <hr>
+        <div class="row">
+          <div class="col-6">
+            <button type="button" class="btn btn-outline-secondary w-100" data-action="dark-mode#toggle" data-dark-mode-target="toggleButton">
+              <i class="bi" data-dark-mode-target="icon"></i>
+            </button>
           </div>
-        </main>
+          <div class="col-6">
+            <%= link_to destroy_usuario_session_path, method: :delete,
+                        class: "btn btn-outline-danger w-100" do %>
+              <i class="bi bi-box-arrow-right me-1"></i> Sair
+            <% end %>
+          </div>
         </div>
       </div>
+    </div>
+  <% end %>
 
-      <!-- Footer -->
-      <footer class="bg-dark text-white text-center py-3 mt-auto">
-        <p class="mb-0">© <%= Time.now.year %> Barbearia do Barbeiro - Todos os direitos reservados.</p>
-      </footer>
-    </body>
-  </html>
+  <div class="container-fluid">
+    <div class="d-md-flex">
+      <!-- Sidebar fixa: só em desktop -->
+      <% if usuario_signed_in? %>
+        <aside data-dark-mode-target="sidebar"
+               class="d-none d-md-block px-3 <%= sidebar_classes %>"
+               style="height: auto; align-self: flex-start;">
+          <%= render "shared/sidebar_links" %>
+        </aside>
+      <% end %>
+
+      <!-- Main content -->
+      <main class="flex-grow-1 py-4">
+        <div class="container-fluid ps-md-3 ps-lg-2 ps-xl-1">
+          <%= yield %>
+        </div>
+      </main>
+    </div>
+  </div>
+
+    <!-- Footer -->
+    <footer class="<%= dark_mode? ? 'bg-dark text-white' : 'bg-light text-dark' %> text-center py-3 mt-auto">
+      <p class="mb-0">© <%= Time.current.year %> Barbearia do Barbeiro - Todos os direitos reservados.</p>
+    </footer>
+  </body>
+</html>

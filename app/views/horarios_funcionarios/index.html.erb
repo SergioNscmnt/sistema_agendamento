@@ -1,0 +1,50 @@
+<h4 class="mb-4">Meus Horários Disponíveis</h4>
+
+<%= form_with model: @novo_horario, url: horarios_funcionarios_path, local: true do |f| %>
+  <div class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <%= f.label :dia_da_semana, "Dia da semana", class: "form-label" %>
+      <%= f.select :dia_da_semana, HorarioFuncionario.dia_da_semana.keys.map { |d| [d.humanize.capitalize, d] },
+                  {}, class: "form-select" %>
+    </div>
+    <div class="col-md-3">
+      <%= f.label :hora, "Horário", class: "form-label" %>
+      <%= f.time_select :hora, { minute_step: 30 }, class: "form-control" %>
+    </div>
+    <div class="col-md-2">
+      <%= f.label :ativo, "Ativo?", class: "form-label d-block" %>
+      <%= f.check_box :ativo, class: "form-check-input" %>
+    </div>
+    <div class="col-md-3 text-end">
+      <%= f.submit "Adicionar", class: "btn btn-primary" %>
+    </div>
+  </div>
+<% end %>
+
+<hr class="my-4">
+
+<div class="row">
+  <% @horarios.group_by(&:dia_da_semana).each do |dia, horarios| %>
+    <div class="col-md-6 mb-3">
+      <div class="card">
+        <div class="card-header">
+          <strong><%= dia.capitalize %></strong>
+        </div>
+        <ul class="list-group list-group-flush">
+          <% horarios.sort_by(&:hora).each do |horario| %>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <%= horario.hora.strftime("%H:%M") %>
+              <div>
+                <span class="badge <%= horario.ativo ? 'bg-success' : 'bg-secondary' %>">
+                  <%= horario.ativo ? "Ativo" : "Inativo" %>
+                </span>
+                <%= link_to "Remover", horario_funcionario_path(horario), method: :delete,
+                            data: { confirm: "Tem certeza?" }, class: "btn btn-sm btn-outline-danger ms-2" %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+</div>

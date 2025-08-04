@@ -1,0 +1,31 @@
+<h4>Editar Configurações</h4>
+
+<%= form_for @usuario, url: configuracoes_path, html: { multipart: true } do |f| %>
+  <%= avatar_upload_field(f, @usuario) %>
+  <div class="mb-3">
+    <%= f.label :nome, 'Nome', class: 'form-label fw-semibold small' %>
+    <%= f.text_field :nome, class: form_control_class %>
+  </div>
+   <div class="mb-3">
+    <%= f.label :email, 'Email', class: 'form-label fw-semibold small' %>
+    <%= f.text_field :email, class: form_control_class %>
+  </div>
+  <div class="row">
+    <div class="col-sm-6 mb-3">
+      <%= f.label :password, 'Nova senha', class: 'form-label fw-semibold small' %>
+      <%= f.password_field :password, autocomplete: 'new-password', class: form_control_class %>
+    </div>
+
+    <div class="col-sm-6 mb-3">
+      <%= f.label :password_confirmation, 'Confirmação da senha', class: 'form-label fw-semibold small' %>
+      <%= f.password_field :password_confirmation, autocomplete: 'new-password', class: form_control_class %>
+    </div>
+  </div>
+  <div class="mt-3 d-flex justify-content-between">
+    <%= link_to configuracoes_path, class: "btn btn-outline-secondary" do %>
+      <i class="bi bi-arrow-left me-1"></i> Voltar
+    <% end %>
+
+    <%= f.submit "Salvar Configurações", class: "btn btn-primary" %>
+  </div>
+<% end %>

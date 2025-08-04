@@ -1,0 +1,46 @@
+<div class="row g-4">
+  <!-- Pessoas agendadas hoje -->
+  <div class="col-md-6 col-xl-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center">
+        <i class="bi bi-calendar-check fs-1 text-primary mb-3"></i>
+        <h5 class="card-title">Agendados Hoje</h5>
+        <p class="fs-4 fw-bold text-dark"><%= @agendamentos_hoje.count %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Atendimentos concluídos -->
+  <div class="col-md-6 col-xl-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center">
+        <i class="bi bi-check-circle fs-1 text-success mb-3"></i>
+        <h5 class="card-title">Atendimentos Concluídos</h5>
+        <p class="fs-4 fw-bold text-dark"><%= @atendimentos_concluidos %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Horários disponíveis -->
+  <div class="col-md-6 col-xl-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center">
+        <i class="bi bi-clock fs-1 text-warning mb-3"></i>
+        <h5 class="card-title">Horários Disponíveis</h5>
+        <p class="fs-4 fw-bold text-dark"><%= @horarios_disponiveis.count %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gerenciar Equipe -->
+  <div class="col-md-6 col-xl-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center">
+        <i class="bi bi-people fs-1 text-secondary mb-3"></i>
+        <h5 class="card-title">Equipe de Funcionários</h5>
+        <p class="fs-4 fw-bold text-dark"><%= @funcionarios.count %></p>
+        <%= link_to 'Ver Funcionários', funcionarios_path, class: 'btn btn-outline-secondary btn-sm mt-2' %>
+      </div>
+    </div>
+  </div>
+</div>

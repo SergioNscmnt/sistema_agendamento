@@ -1,10 +1,20 @@
-<p style="color: green"><%= notice %></p>
-
-<%= render @agendamento %>
-
-<div>
-  <%= link_to "Edit this agendamento", edit_agendamento_path(@agendamento) %> |
-  <%= link_to "Back to agendamentos", agendamentos_path %>
-
-  <%= button_to "Destroy this agendamento", @agendamento, method: :delete %>
-</div>
+<% if current_usuario.funcionario? %>
+  <div class="row">
+    <%= render "cards/funcionario_agendados", count: @agendados_hoje %>
+    <%= render "cards/funcionario_horarios", horarios: @horarios_ocupados %>
+    <%= render "cards/funcionario_concluidos", count: @concluidos %>
+  </div>
+<% elsif current_usuario.cliente? %>
+  <div class="row">
+    <%= render "cards/cliente_concluidos", count: @concluidos %>
+    <%= render "cards/cliente_ultimos", servicos: @ultimos_servicos %>
+    <%= link_to "Agendar novo horário", new_agendamento_path, class: "btn btn-primary mt-3" %>
+  </div>
+<% elsif current_usuario.admin? %>
+  <div class="row">
+    <%= render "cards/admin_agendados", count: @agendados_hoje %>
+    <%= render "cards/admin_concluidos", count: @concluidos %>
+    <%= render "cards/admin_horarios", horarios: @horarios_ocupados %>
+    <%= render "cards/admin_equipe", equipe: @equipe %>
+  </div>
+<% end %>

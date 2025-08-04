@@ -8,12 +8,10 @@ export default class extends Controller {
     requestAnimationFrame(() => {
       if (window.jQuery && $.fn.select2) {
         $(this.element).select2({
-          width: "100%",
-          theme: "bootstrap-5",
-          placeholder: $(this.element).find('option:first').text(),
-          allowClear: true,
-          dropdownParent: $('body')
-        });
+          theme: "bootstrap4", // ou "bootstrap-5" se usar um tema alternativo
+          width: '100%',
+          dropdownParent: $(this.element).parent()
+        })
       } else {
         console.error("❌ jQuery ou Select2 não estão disponíveis!");
       }

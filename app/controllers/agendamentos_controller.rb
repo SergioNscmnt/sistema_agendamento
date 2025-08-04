@@ -4,11 +4,17 @@ class AgendamentosController < ApplicationController
   # GET /agendamentos or /agendamentos.json
   def index
     if current_usuario.cliente?
-      @agendamentos = Agendamento.includes(:funcionario).where(cliente_id: current_usuario.id)
+      @agendamentos_concluidos = current_usuario.agendamentos_concluidos
+      @ultimos_servicos = current_usuario.ultimos_servicos
     elsif current_usuario.funcionario?
-      @agendamentos = Agendamento.includes(:cliente, :servico).where(funcionario_id: current_usuario.id)
-    else
-      @agendamentos = Agendamento.all
+      @agendamentos_hoje = current_usuario.agendamentos_do_dia
+      @horarios_disponiveis = current_usuario.horarios_disponiveis
+      @atendimentos_concluidos = current_usuario.agendamentos_concluidos.count
+    elsif current_usuario.administrador?
+      @agendamentos_hoje = Agendamento.do_dia
+      @horarios_disponiveis = current_usuario.horarios_disponiveis_para
+      @atendimentos_concluidos = Agendamento.concluido.count
+      @funcionarios = Usuario.funcionarios
     end
   end
 
