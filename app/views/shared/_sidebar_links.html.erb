@@ -14,7 +14,7 @@
       </li>
       <% if current_usuario.funcionario? || current_usuario.administrador? %>
         <li class="nav-item">
-          <%= link_to horarios_funcionarios_path, class: "nav-link" do %>
+          <%= link_to horario_funcionarios_path, class: "nav-link" do %>
             <i class="bi bi-clock-history me-1"></i> Meus Horários
           <% end %>
         </li>

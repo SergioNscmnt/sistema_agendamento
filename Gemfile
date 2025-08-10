@@ -19,6 +19,7 @@ gem "importmap-rails"
 
 gem 'image_processing'
 gem 'mini_magick'
+gem 'cancancan', '~> 3.6'
 
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem "turbo-rails"

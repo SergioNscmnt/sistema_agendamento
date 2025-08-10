@@ -1,85 +1,73 @@
 class AgendamentosController < ApplicationController
-  before_action :set_agendamento, only: %i[ show edit update destroy ]
+  before_action :authenticate_usuario!
 
-  # GET /agendamentos or /agendamentos.json
   def index
-    if current_usuario.cliente?
-      @agendamentos_concluidos = current_usuario.agendamentos_concluidos
-      @ultimos_servicos = current_usuario.ultimos_servicos
-    elsif current_usuario.funcionario?
-      @agendamentos_hoje = current_usuario.agendamentos_do_dia
-      @horarios_disponiveis = current_usuario.horarios_disponiveis
-      @atendimentos_concluidos = current_usuario.agendamentos_concluidos.count
-    elsif current_usuario.administrador?
-      @agendamentos_hoje = Agendamento.do_dia
-      @horarios_disponiveis = current_usuario.horarios_disponiveis_para
-      @atendimentos_concluidos = Agendamento.concluido.count
-      @funcionarios = Usuario.funcionarios
-    end
+    @agendamentos = Agendamento
+                      .accessible_by(current_ability)
+                      .order(:horario)
   end
 
-  # GET /agendamentos/1 or /agendamentos/1.json
-  def show
-  end
-
-  # GET /agendamentos/new
   def new
-    @agendamento = Agendamento.new    
-    if current_usuario.cliente?
-      @agendamento.cliente_id = current_usuario.id
-    end
+    @agendamento = Agendamento.new
+    authorize! :create, @agendamento
+    @agendamento.cliente_id ||= current_usuario.id if current_usuario.cliente?
   end
 
-  # GET /agendamentos/1/edit
-  def edit
-  end
-
-  # POST /agendamentos or /agendamentos.json
   def create
-    @agendamento = Agendamento.new(agendamento_params)
-    
-    if current_usuario.cliente?
-      @agendamento.cliente = current_usuario
-    end
+    @agendamento = Agendamento.new(agendamento_params_for_role)
+    authorize! :create, @agendamento
 
     if @agendamento.save
       redirect_to agendamentos_path, notice: "Agendamento criado com sucesso."
     else
-      render :new
+      flash.now[:alert] = @agendamento.errors.full_messages.to_sentence
+      render :new, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /agendamentos/1 or /agendamentos/1.json
+  def show
+    @agendamento = Agendamento.find(params[:id])
+    authorize! :read, @agendamento
+  end
+
+  def edit
+    @agendamento = Agendamento.find(params[:id])
+    authorize! :update, @agendamento
+  end
+
   def update
-    respond_to do |format|
-      if @agendamento.update(agendamento_params)
-        format.html { redirect_to @agendamento, notice: "Agendamento was successfully updated." }
-        format.json { render :show, status: :ok, location: @agendamento }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @agendamento.errors, status: :unprocessable_entity }
-      end
+    @agendamento = Agendamento.find(params[:id])
+    authorize! :update, @agendamento
+
+    if @agendamento.update(agendamento_params_for_role)
+      redirect_to @agendamento, notice: "Agendamento atualizado com sucesso."
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
-  # DELETE /agendamentos/1 or /agendamentos/1.json
   def destroy
+    @agendamento = Agendamento.find(params[:id])
+    authorize! :destroy, @agendamento
     @agendamento.destroy!
+    redirect_to agendamentos_path, status: :see_other, notice: "Agendamento removido."
+  end
 
-    respond_to do |format|
-      format.html { redirect_to agendamentos_path, status: :see_other, notice: "Agendamento was successfully destroyed." }
-      format.json { head :no_content }
-    end
+  def novos_horarios
+    authorize! :read, HorarioFuncionario
+    func = Usuario.funcionarios.find(params[:funcionario_id])
+    data = (params[:data].presence&.to_date) || Time.zone.today
+    @horarios = Agendamento.disponiveis_para_funcionario_no_dia(func, data)
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_agendamento
-      @agendamento = Agendamento.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def agendamento_params
-      params.require(:agendamento).permit(:cliente_id, :funcionario_id, :servico_id, :horario, :status)
+  def agendamento_params_for_role
+    base = params.require(:agendamento).permit(:funcionario_id, :servico_id, :horario, :status, :cliente_id)
+    if current_usuario.cliente?
+      base = base.except(:status, :cliente_id)
+      base[:cliente_id] = current_usuario.id
     end
+    base
+  end
 end

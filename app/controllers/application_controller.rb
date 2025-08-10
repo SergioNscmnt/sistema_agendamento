@@ -1,7 +1,11 @@
 class ApplicationController < ActionController::Base
-    before_action :authenticate_usuario!
+  before_action :authenticate_usuario!
 
-    def after_sign_in_path_for(resource)
-       root_path
-    end
+  def current_ability
+    @current_ability ||= Ability.new(current_usuario)
+  end
+
+  rescue_from CanCan::AccessDenied do |e|
+    redirect_to root_path, alert: "Acesso negado: #{e.message}"
+  end
 end

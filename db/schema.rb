@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_08_03_201333) do
+ActiveRecord::Schema[7.1].define(version: 2025_08_08_224901) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -47,10 +47,11 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_03_201333) do
     t.bigint "funcionario_id", null: false
     t.bigint "servico_id", null: false
     t.datetime "horario"
-    t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "status", default: 0, null: false
     t.index ["cliente_id"], name: "index_agendamentos_on_cliente_id"
+    t.index ["funcionario_id", "horario"], name: "idx_agendamento_slot_unico", unique: true, where: "(status = ANY (ARRAY[0, 1]))"
     t.index ["funcionario_id"], name: "index_agendamentos_on_funcionario_id"
     t.index ["servico_id"], name: "index_agendamentos_on_servico_id"
   end
@@ -74,9 +75,11 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_03_201333) do
     t.bigint "usuario_id", null: false
     t.integer "dia_da_semana"
     t.time "hora"
-    t.boolean "ativo"
+    t.boolean "ativo", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "status", default: 0, null: false
+    t.integer "duracao_minutos", default: 60, null: false
     t.index ["usuario_id"], name: "index_horario_funcionarios_on_usuario_id"
   end
 
@@ -117,8 +120,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_03_201333) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "agendamentos", "clientes"
-  add_foreign_key "agendamentos", "funcionarios"
   add_foreign_key "agendamentos", "servicos"
+  add_foreign_key "agendamentos", "usuarios", column: "cliente_id"
+  add_foreign_key "agendamentos", "usuarios", column: "funcionario_id"
   add_foreign_key "horario_funcionarios", "usuarios"
 end

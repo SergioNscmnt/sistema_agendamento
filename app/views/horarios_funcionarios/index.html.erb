@@ -1,22 +1,34 @@
 <h4 class="mb-4">Meus Horários Disponíveis</h4>
 
-<%= form_with model: @novo_horario, url: horarios_funcionarios_path, local: true do |f| %>
+<%= form_with model: @horario_funcionario, url: horario_funcionarios_path, local: true do |f| %>
+
+  <% if @horario_funcionario.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% @horario_funcionario.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
   <div class="row g-2 align-items-end">
-    <div class="col-md-4">
+    <div class="col-md-3">
       <%= f.label :dia_da_semana, "Dia da semana", class: "form-label" %>
-      <%= f.select :dia_da_semana, HorarioFuncionario.dia_da_semana.keys.map { |d| [d.humanize.capitalize, d] },
-                  {}, class: "form-select" %>
+      <%= f.select :dia_da_semana, HorarioFuncionario.dia_da_semanas.keys.map { |d| [d.humanize.capitalize, d] }, {}, class: "form-select" %>
     </div>
     <div class="col-md-3">
       <%= f.label :hora, "Horário", class: "form-label" %>
-      <%= f.time_select :hora, { minute_step: 30 }, class: "form-control" %>
+      <%= f.time_field :hora, class: "form-control", step: 1800 %>
     </div>
-    <div class="col-md-2">
-      <%= f.label :ativo, "Ativo?", class: "form-label d-block" %>
-      <%= f.check_box :ativo, class: "form-check-input" %>
+    <div class="col-md-2 d-flex align-items-center">
+      <div class="form-check mt-4">
+        <%= f.check_box :ativo, class: "form-check-input", id: "hf_ativo" %>
+        <%= f.label :ativo, "Ativo?", class: "form-check-label", for: "hf_ativo" %>
+      </div>
     </div>
-    <div class="col-md-3 text-end">
-      <%= f.submit "Adicionar", class: "btn btn-primary" %>
+    <div class="col-md-4 text-end">
+      <%= f.submit "Adicionar", class: "btn btn-primary mt-4" %>
     </div>
   </div>
 <% end %>
@@ -24,7 +36,7 @@
 <hr class="my-4">
 
 <div class="row">
-  <% @horarios.group_by(&:dia_da_semana).each do |dia, horarios| %>
+  <% @horarios_funcionarios.group_by(&:dia_da_semana).each do |dia, horarios| %>
     <div class="col-md-6 mb-3">
       <div class="card">
         <div class="card-header">
@@ -38,8 +50,7 @@
                 <span class="badge <%= horario.ativo ? 'bg-success' : 'bg-secondary' %>">
                   <%= horario.ativo ? "Ativo" : "Inativo" %>
                 </span>
-                <%= link_to "Remover", horario_funcionario_path(horario), method: :delete,
-                            data: { confirm: "Tem certeza?" }, class: "btn btn-sm btn-outline-danger ms-2" %>
+                <%= link_to "Remover", horario, data: { turbo_method: :delete, turbo_confirm: "Tem certeza?" }, class: "btn btn-sm btn-outline-danger ms-2" %>
               </div>
             </li>
           <% end %>

@@ -1,10 +1,35 @@
-<p>Perfil atual: <%= current_usuario.perfil %></p>
-<div class="container">
-  <% if current_usuario.administrador? %>
-    <%= render "administrador" %>
-  <% elsif current_usuario.funcionario? %>
-    <%= render "funcionario" %>
-  <% elsif current_usuario.cliente? %>
-    <%= render "cliente" %>
+<h2>Agendamentos</h2>
+
+<div class="d-flex justify-content-end mb-3">
+  <% if can? :create, Agendamento %>
+    <%= link_to "Novo agendamento", new_agendamento_path, class: "btn btn-primary" %>
   <% end %>
+</div>
+<div class="tab-panel">
+  <table class="table table-striped m-t">
+    <thead>
+      <tr>
+        <th>Data/Hora</th>
+        <th>Profissional</th>
+        <th>Serviço</th>
+        <th>Status</th>
+        <th width="180"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @agendamentos.each do |a| %>
+        <tr>
+          <td><%= l a.horario, format: :short %></td>
+          <td><%= a.funcionario&.nome || a.funcionario_id %></td>
+          <td><%= a.servico&.nome %></td>
+          <td><span class="label label-default"><%= a.status.humanize %></span></td>
+          <td class="text-right">
+            <%= link_to "Ver", agendamento_path(a), class: "btn btn-xs btn-default" if can?(:read, a) %>
+            <%= link_to "Editar", edit_agendamento_path(a), class: "btn btn-xs btn-warning" if can?(:update, a) %>
+            <%= link_to "Excluir", a, method: :delete, data: { confirm: "Confirma remover?" }, class: "btn btn-xs btn-danger" if can?(:destroy, a) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 </div>
