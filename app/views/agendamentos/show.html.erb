@@ -1,20 +1,39 @@
-<% if current_usuario.funcionario? %>
-  <div class="row">
-    <%= render "cards/funcionario_agendados", count: @agendados_hoje %>
-    <%= render "cards/funcionario_horarios", horarios: @horarios_ocupados %>
-    <%= render "cards/funcionario_concluidos", count: @concluidos %>
-  </div>
-<% elsif current_usuario.cliente? %>
-  <div class="row">
-    <%= render "cards/cliente_concluidos", count: @concluidos %>
-    <%= render "cards/cliente_ultimos", servicos: @ultimos_servicos %>
-    <%= link_to "Agendar novo horário", new_agendamento_path, class: "btn btn-primary mt-3" %>
-  </div>
-<% elsif current_usuario.admin? %>
-  <div class="row">
-    <%= render "cards/admin_agendados", count: @agendados_hoje %>
-    <%= render "cards/admin_concluidos", count: @concluidos %>
-    <%= render "cards/admin_horarios", horarios: @horarios_ocupados %>
-    <%= render "cards/admin_equipe", equipe: @equipe %>
-  </div>
+<h3>Agendamento</h3>
+
+<% unless @agendamento %>
+  <div class="alert alert-danger">Agendamento não encontrado.</div>
+  <%= link_to "Voltar", agendamentos_path, class: "btn btn-light" %>
+  <% return %>
 <% end %>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <p><strong>Data/Hora:</strong> <%= l @agendamento.horario, format: :long %></p>
+    <p><strong>Profissional:</strong> <%= @agendamento.funcionario&.nome %></p>
+    <p><strong>Cliente:</strong> <%= @agendamento.cliente&.nome %></p>
+    <p><strong>Serviço:</strong> <%= @agendamento.servico&.nome %></p>
+    <p><strong>Status:</strong><%= status_label(@agendamento.status) %></p>
+  </div>
+</div>
+
+<div class="d-flex gap-2">
+  <%= link_to "Voltar", agendamentos_path, class: "btn btn-light" %>
+
+  <% if can? :update, @agendamento %>
+    <%= link_to "Editar", edit_agendamento_path(@agendamento), class: "btn btn-warning" %>
+  <% end %>
+
+  <% if can? :destroy, @agendamento %>
+    <%= link_to "Excluir", @agendamento, data: { turbo_method: :delete, turbo_confirm: "Confirma remover?" }, class: "btn btn-danger" %>
+  <% end %>
+
+  <% if can? :alterar_status, @agendamento %>
+      <%= link_to "Concluir", concluir_agendamento_path(@agendamento),
+              data: { turbo_method: :patch, turbo_confirm: "Marcar como concluído?" },
+              class: "btn btn-success" %>
+
+  <%= link_to "Cancelar", cancelar_agendamento_path(@agendamento),
+              data: { turbo_method: :patch, turbo_confirm: "Cancelar este agendamento?" },
+              class: "btn btn-outline-danger" %>
+  <% end %>
+</div>

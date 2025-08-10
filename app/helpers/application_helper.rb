@@ -55,4 +55,19 @@ module ApplicationHelper
   def sidebar_classes
     'col-md-3 col-lg-2 border-end p-3'
   end
+
+  def status_label(status)
+    cor =
+      case status.to_s
+      when "concluido" then "success"   # verde
+      when "agendado"  then "primary"   # azul
+      when "cancelado" then "danger"    # vermelho
+      else                   "secondary" # cinza
+      end
+    
+    # Compatível com Bootstrap 3 e 5
+    classes = "label label-#{cor} badge bg-#{cor}"
+    
+    content_tag(:span, status.humanize, class: classes)
+  end
 end

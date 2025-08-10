@@ -1,20 +1,17 @@
 import { Controller } from "@hotwired/stimulus"
+import $ from "jquery"
+import "select2"
 
 export default class extends Controller {
   connect() {
-    console.log("🎯 select2_controller conectado");
+    $(this.element).select2({
+      theme: "bootstrap-5",
+      placeholder: this.element.dataset.placeholder || "Selecione...",
+      allowClear: true
+    })
+  }
 
-    // Espera o frame de renderização seguinte antes de inicializar
-    requestAnimationFrame(() => {
-      if (window.jQuery && $.fn.select2) {
-        $(this.element).select2({
-          theme: "bootstrap4", // ou "bootstrap-5" se usar um tema alternativo
-          width: '100%',
-          dropdownParent: $(this.element).parent()
-        })
-      } else {
-        console.error("❌ jQuery ou Select2 não estão disponíveis!");
-      }
-    });
+  disconnect() {
+    $(this.element).select2("destroy")
   }
 }

@@ -37,18 +37,18 @@ class Agendamento < ApplicationRecord
 
   def slot_existe_no_template
     return if horario.blank? || funcionario_id.blank?
-
+  
     wday = horario.wday
-    hora  = horario.strftime("%H:%M:%S")
-
+    t     = horario.change(sec: 0) # garante :00
+  
     existe = HorarioFuncionario
-               .where(usuario_id: funcionario_id, ativo: true, dia_da_semana: wday)
-               .where(status: :livre)
-               .where("TO_CHAR(hora, 'HH24:MI:SS') = ?", hora)
+               .where(usuario_id: funcionario_id, ativo: true, dia_da_semana: wday, status: :livre)
+               .where(hora: t) # AR faz cast correto para :time
                .exists?
-
+  
     errors.add(:horario, "não corresponde a um slot disponível do funcionário") unless existe
   end
+
 
   # Horários disponíveis calculados a partir do template semanal (horario_funcionarios)
   # Retorna uma lista de datetimes possíveis para a data

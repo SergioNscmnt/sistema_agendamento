@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   resource :configuracoes, only: [:show, :edit, :update]
 
   # Admin pode ver horários de um usuário específico (helpers baseados em "horario_"; URL segue "horarios_")
-  resources :usuarios, only: [] do
+  resources :usuarios, only: [:index] do
     resources :horario_funcionarios,
               path: 'horarios_funcionarios',
               controller: 'horarios_funcionarios',
@@ -24,6 +24,10 @@ Rails.application.routes.draw do
 
   resources :agendamentos do
     collection { get :novos_horarios }
+    member do
+      patch :concluir
+      patch :cancelar
+    end
   end
 
   resources :servicos

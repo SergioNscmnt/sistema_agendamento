@@ -1,0 +1,15 @@
+<%# Recebe: disponiveis: Array<Time> %>
+<% if disponiveis.blank? %>
+  <div class="alert alert-warning mb-0">Sem horários disponíveis para os filtros selecionados.</div>
+<% else %>
+  <div class="row g-2">
+    <% disponiveis.each do |t| %>
+      <div class="col-auto">
+        <label class="btn btn-outline-primary btn-sm">
+          <input type="radio" name="agendamento[horario]" value="<%= t.iso8601 %>" autocomplete="off">
+          <%= l t, format: "%H:%M" %>
+        </label>
+      </div>
+    <% end %>
+  </div>
+<% end %>

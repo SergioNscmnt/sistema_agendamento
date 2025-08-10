@@ -6,61 +6,62 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <link rel="preload" href="/assets/application.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-      
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-      
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
-      
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
     <!-- Select2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-      
-    <!-- Select2 Bootstrap 5 Theme (opcional) -->
-    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css" rel="stylesheet">
-      
-    <!-- Estilos da aplicação (Rails) -->
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-      
-    <!-- jQuery (antes do Select2) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-      
-    <!-- Select2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-      
-    <!-- Importmap (Stimulus/Turbo etc.) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
+
+    <!-- jQuery + Select2 JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.full.min.js"></script>
+
+    <!-- Importmap (Turbo/Stimulus/controllers) -->
     <%= javascript_importmap_tags %>
-      
-    <!-- Bootstrap Bundle JS -->
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+
+    <!-- CSS da aplicação -->
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
   </head>
 
-  <body data-controller="dark-mode" data-dark-mode-enabled-value="<%= current_usuario&.dark_mode? %>" class=" d-flex flex-column <%= body_classes %> " style="min-height: 100vh;">
+  <body data-controller="dark-mode"
+        data-dark-mode-enabled-value="<%= current_usuario&.dark_mode? %>"
+        class="d-flex flex-column <%= body_classes %>"
+        style="min-height: 100vh;">
+
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
       <a class="navbar-brand" href="#">Barbearia do Barbeiro</a>
 
-      <!-- 1) Apenas em mobile: botao offcanvas -->
       <% if usuario_signed_in? %>
-        <button class="btn btn-outline-light d-md-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
+        <!-- Botão Offcanvas (mobile) -->
+        <button class="btn btn-outline-light d-md-none me-2"
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#mobileSidebar">
           <i class="bi bi-list"></i>
         </button>
       <% end %>
-      
-      <!-- Conteúdo da navbar (desktop) -->
+
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto"></ul>
         <div class="d-flex align-items-center">
-          <!-- Toggle Dark Mode (sempre visível) -->
+          <!-- Botão Dark Mode -->
           <button type="button" class="btn btn-outline-secondary me-3" data-action="dark-mode#toggle">
-            <i data-dark-mode-target="icon" class="bi <%= current_usuario&.dark_mode? ? 'bi-eye-slash' : 'bi-eye' %>"></i>
+            <i data-dark-mode-target="icon"
+               class="bi <%= current_usuario&.dark_mode? ? 'bi-eye-slash' : 'bi-eye' %>"></i>
           </button>
 
-          <!-- Logout dropdown: só em desktop -->
           <% if usuario_signed_in? %>
+            <!-- Dropdown Usuário (desktop) -->
             <li class="nav-item dropdown list-unstyled d-none d-md-block">
-              <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#"
-                role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="nav-link dropdown-toggle d-flex align-items-center gap-2"
+                 href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <% if current_usuario.avatar.attached? %>
                   <%= image_tag current_usuario.avatar.variant(resize_to_fill: [30,30]).processed,
                                 class: "rounded-circle", alt: current_usuario.nome %>
@@ -70,59 +71,71 @@
                 <strong data-dark-mode-target="username"><%= current_usuario.nome %></strong>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li><%= link_to "Sair", destroy_usuario_session_path,
-                              method: :delete, class: "dropdown-item" %></li>
+                <li><%= link_to "Sair", destroy_usuario_session_path, method: :delete, class: "dropdown-item" %></li>
               </ul>
             </li>
           <% end %>
         </div>
-      </div>    </nav>
-
-  <% if usuario_signed_in? %>
-    <!-- Offcanvas: só em mobile -->
-    <div class="offcanvas offcanvas-start d-md-none"
-         tabindex="-1" id="mobileSidebar"
-         data-bs-scroll="true" data-bs-backdrop="false">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title">Menu</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
       </div>
-      <div class="offcanvas-body">
-        <%= render "shared/sidebar_links" %>
-        <hr>
-        <div class="row">
-          <div class="col-6">
-            <button type="button" class="btn btn-outline-secondary w-100" data-action="dark-mode#toggle" data-dark-mode-target="toggleButton">
-              <i class="bi" data-dark-mode-target="icon"></i>
-            </button>
-          </div>
-          <div class="col-6">
-            <%= button_to "Sair", destroy_usuario_session_path, method: :delete, class: "btn btn-link p-0" %>
-          </div>
+    </nav>
+
+    <% if usuario_signed_in? %>
+      <!-- Offcanvas (mobile) -->
+      <div class="offcanvas offcanvas-start d-md-none"
+           tabindex="-1" id="mobileSidebar"
+           data-bs-scroll="true" data-bs-backdrop="false">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Menu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
-      </div>
-    </div>
-  <% end %>
-
-  <div class="container-fluid">
-    <div class="d-md-flex">
-      <!-- Sidebar fixa: só em desktop -->
-      <% if usuario_signed_in? %>
-        <aside data-dark-mode-target="sidebar"
-               class="d-none d-md-block px-3 <%= sidebar_classes %>"
-               style="height: auto; align-self: flex-start;">
+        <div class="offcanvas-body">
           <%= render "shared/sidebar_links" %>
-        </aside>
-      <% end %>
-
-      <!-- Main content -->
-      <main class="flex-grow-1 py-4">
-        <div class="container-fluid ps-md-3 ps-lg-2 ps-xl-1">
-          <%= yield %>
+          <hr>
+          <div class="row">
+            <div class="col-6">
+              <button type="button" class="btn btn-outline-secondary w-100"
+                      data-action="dark-mode#toggle"
+                      data-dark-mode-target="toggleButton">
+                <i class="bi" data-dark-mode-target="icon"></i>
+              </button>
+            </div>
+            <div class="col-6">
+              <%= button_to "Sair", destroy_usuario_session_path, method: :delete, class: "btn btn-link p-0" %>
+            </div>
+          </div>
         </div>
-      </main>
+      </div>
+    <% end %>
+
+    <div class="container-fluid">
+      <div class="d-md-flex">
+        <% if usuario_signed_in? %>
+          <!-- Sidebar (desktop) -->
+          <aside data-dark-mode-target="sidebar"
+                 class="d-none d-md-block px-3 <%= sidebar_classes %>"
+                 style="height: auto; align-self: flex-start;">
+            <%= render "shared/sidebar_links" %>
+          </aside>
+        <% end %>
+
+        <!-- Conteúdo principal -->
+        <main class="flex-grow-1 py-4">
+          <div class="container-fluid ps-md-3 ps-lg-2 ps-xl-1">
+            <%= yield %>
+          </div>
+        </main>
+      </div>
     </div>
-  </div>
+
+    <div class="modal fade" id="agendamentoModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <turbo-frame id="agendamento_modal">
+            <!-- O conteúdo do formulário será carregado aqui -->
+          </turbo-frame>
+        </div>
+      </div>
+    </div>
 
     <!-- Footer -->
     <footer class="<%= dark_mode? ? 'bg-dark text-white' : 'bg-light text-dark' %> text-center py-3 mt-auto">

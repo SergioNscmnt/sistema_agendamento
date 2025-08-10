@@ -1,34 +1,148 @@
-<%= form_with(model: agendamento, local: true) do |form| %>
-
-  <% if current_usuario.cliente? %>
-    <%= form.hidden_field :cliente_id, value: current_usuario.id %>
-    <div class="mb-3">
-      <label class="form-label">Cliente</label>
-      <input type="text" class="form-control" value="<%= current_usuario.nome %>" readonly>
+<h3><%= t("views.#{controller_name}.#{action_name}.title") %></h3>
+<%= form_with(model: agendamento, local: true, data: { controller: "agendamento" }) do |f| %>
+  <div class="card shadow-sm">
+    <div class="card-header border-0 pb-0">
+      <ul class="nav nav-tabs" id="agendamentoTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="tab-cliente" data-bs-toggle="tab" data-bs-target="#pane-cliente" type="button" role="tab" aria-controls="pane-cliente" aria-selected="true">
+            Cliente
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-prof-serv" data-bs-toggle="tab" data-bs-target="#pane-prof-serv" type="button" role="tab" aria-controls="pane-prof-serv" aria-selected="false">
+            Profissional & Serviço
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-data-hora" data-bs-toggle="tab" data-bs-target="#pane-data-hora" type="button" role="tab" aria-controls="pane-data-hora" aria-selected="false">
+            Data & Horário
+          </button>
+        </li>
+      </ul>
     </div>
-  <% else %>
-    <div class="mb-3">
-      <%= form.label :nome_cliente_convidado, "Nome do Cliente (convidado)", class: "form-label" %>
-      <%= form.text_field :nome_cliente_convidado, class: "form-control" %>
+
+    <div class="card-body">
+      <% if agendamento.errors.any? %>
+        <div class="alert alert-danger">
+          <ul class="mb-0">
+            <% agendamento.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="tab-content pt-3" id="agendamentoTabsContent">
+        <!-- PANE: CLIENTE -->
+        <div class="tab-pane fade show active" id="pane-cliente" role="tabpanel" aria-labelledby="tab-cliente" tabindex="0">
+          <div class="row g-3">
+            <% if current_usuario.cliente? %>
+              <%= f.hidden_field :cliente_id, value: current_usuario.id %>
+              <div class="col-12 col-lg-6">
+                <label class="form-label">Cliente</label>
+                <input type="text" class="form-control" value="<%= current_usuario.nome %>" readonly>
+              </div>
+            <% else %>
+              <div class="col-12 col-lg-6">
+                <%= f.label :nome_cliente_convidado, "Nome do Cliente (convidado)", class: "form-label" %>
+                <%= f.text_field :nome_cliente_convidado,
+                      class: "form-control #{'is-invalid' if agendamento.errors[:nome_cliente_convidado].present?}",
+                      placeholder: "Ex.: Maria Silva" %>
+                <% if agendamento.errors[:nome_cliente_convidado].present? %>
+                  <div class="invalid-feedback d-block"><%= agendamento.errors[:nome_cliente_convidado].first %></div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- PANE: PROFISSIONAL & SERVIÇO -->
+        <div class="tab-pane fade" id="pane-prof-serv" role="tabpanel" aria-labelledby="tab-prof-serv" tabindex="0">
+          <div class="row g-3">
+            <div class="col-12 col-lg-6">
+              <%= f.label :funcionario_id, "Profissional", class: "form-label" %>
+              <%= f.collection_select :funcionario_id,
+                    Usuario.funcionario.order(:nome), :id, :nome,
+                    { include_blank: "Selecione um profissional" },
+                    {
+                      class: "form-select w-100 #{'is-invalid' if agendamento.errors[:funcionario_id].present?}",
+                      data: {
+                        controller: "select2",
+                        action: "change->agendamento#refresh select2:clear->agendamento#refresh",
+                        placeholder: "Selecione um profissional"
+                      }
+                    } %>
+              <% if agendamento.errors[:funcionario_id].present? %>
+                <div class="invalid-feedback d-block"><%= agendamento.errors[:funcionario_id].first %></div>
+              <% end %>
+            </div>
+
+            <div class="col-12 col-lg-6">
+              <%= f.label :servico_id, "Serviço", class: "form-label" %>
+              <%= f.collection_select :servico_id,
+                    (@servicos || Servico).order(:nome), :id, :nome,
+                    { include_blank: "Selecione um serviço" },
+                    {
+                      class: "form-select w-100 #{'is-invalid' if agendamento.errors[:servico_id].present?}",
+                      data: {
+                        controller: "select2",
+                        action: "change->agendamento#refresh select2:clear->agendamento#refresh",
+                        placeholder: "Selecione um serviço"
+                      }
+                    } %>
+              <% if agendamento.errors[:servico_id].present? %>
+                <div class="invalid-feedback d-block"><%= agendamento.errors[:servico_id].first %></div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE: DATA & HORÁRIO -->
+        <div class="tab-pane fade" id="pane-data-hora" role="tabpanel" aria-labelledby="tab-data-hora" tabindex="0">
+          <div class="row g-3">
+            <div class="col-12 col-lg-6">
+              <%= f.label :data, "Data", class: "form-label" %>
+              <%= date_field_tag :data,
+                    params[:data] || (agendamento.horario&.to_date || Date.current),
+                    class: "form-control #{'is-invalid' if agendamento.errors[:horario].present?}",
+                    min: Date.current,
+                    data: { action: "change->agendamento#refresh", agendamento_target: "data" } %>
+            </div>
+
+            <div class="col-12">
+              <%= f.label :horario, "Horário", class: "form-label" %>
+              <turbo-frame id="horarios-frame" data-agendamento-target="frame" class="d-block p-2 border rounded">
+                <div class="text-muted">Escolha profissional, serviço e data para ver os horários disponíveis.</div>
+              </turbo-frame>
+              <% if agendamento.errors[:horario].present? %>
+                <div class="invalid-feedback d-block"><%= agendamento.errors[:horario].first %></div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div> <!-- /tab-content -->
     </div>
-  <% end %>
 
-  <div class="mb-3">
-    <%= form.label :funcionario_id, "Funcionário", class: "form-label" %>
-    <%= form.collection_select :funcionario_id, Usuario.funcionario, :id, :nome, prompt: "Selecione um funcionário", class: "form-select" %>
-  </div>
+    <div class="card-footer bg-light d-flex justify-content-end gap-2">
+      <%= link_to t("helpers.actions.back", default: "Voltar"),
+                  agendamentos_path,
+                  class: "btn btn-outline-secondary" %>
 
-  <div class="mb-3">
-    <%= form.label :horario, class: "form-label" %>
-    <%= form.datetime_field :horario, class: "form-control" %>
-  </div>
- <!-- FALTA AJUSTAR O SELECT 2 -->
-  <div class="mb-3">
-    <%= form.collection_select :servico_id, Servico.all, :id, :nome, { prompt: "Selecione um serviço"},
-      { class: "form-select", data: { controller: "select2" } } %>
-  </div>
+      <% if agendamento.persisted? %>
+        <%= link_to t("helpers.actions.show", default: "Ver"),
+                    agendamento_path(agendamento),
+                    class: "btn btn-primary" %>
+      <% end %>
 
-  <div class="d-grid">
-    <%= form.submit "Salvar Agendamento", class: "btn btn-success" %>
+      <%= f.submit t("helpers.submit.save", default: "Salvar"), class: "btn btn-success" %>
+
+      <% if agendamento.persisted? && can?(:destroy, agendamento) %>
+        <%= link_to t("helpers.actions.delete", default: "Excluir"),
+                    agendamento,
+                    data: { turbo_method: :delete, turbo_confirm: t("helpers.confirm", default: "Confirma remover?") },
+                    class: "btn btn-danger" %>
+      <% end %>
+    </div>
   </div>
 <% end %>
+
