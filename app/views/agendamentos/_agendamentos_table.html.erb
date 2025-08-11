@@ -1,0 +1,39 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Data/Hora</th>
+      <th>Profissional</th>
+      <th>Serviço</th>
+      <th>Status</th>
+      <th class="text-end" width="180"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% Array(agendamentos).each do |a| %>
+      <tr>
+        <td><%= l a.horario, format: :short %></td>
+        <td><%= a.funcionario&.nome || a.funcionario_id %></td>
+        <td><%= a.servico&.nome %></td>
+        <td><%= status_label(a.status) %></td>
+        <td class="text-end">
+          <div class="btn-group" role="group">
+            <%= link_to agendamento_path(a), class: "btn btn-sm btn-outline-secondary", title: "Ver" do %>
+              <i class="bi bi-eye"></i>
+            <% end %>
+            <% if can?(:update, a) %>
+              <%= link_to edit_agendamento_path(a), class: "btn btn-sm btn-outline-primary", data: { turbo_frame: "agendamento_modal", bs_toggle: "modal", bs_target: "#agendamentoModal" } do %> <i class="bi bi-pencil"></i> <% end %>
+            <% end %>
+            <% if can?(:destroy, a) %>
+              <%= link_to a,
+                          data: { turbo_method: :delete, turbo_confirm: "Confirma remover?" },
+                          class: "btn btn-sm btn-outline-danger",
+                          title: "Excluir" do %>
+                <i class="bi bi-trash"></i>
+              <% end %>
+            <% end %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

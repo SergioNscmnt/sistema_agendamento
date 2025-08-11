@@ -13,3 +13,9 @@
 body {
   font-family: "Segoe UI", sans-serif;
 }
+
+/* editar -> branco no hover */
+a.btn.btn-outline-primary:hover i.bi.bi-pencil { color: #fff !important; }
+
+/* excluir -> branco no hover */
+a.btn.btn-outline-danger:hover  i.bi.bi-trash  { color: #fff !important; }

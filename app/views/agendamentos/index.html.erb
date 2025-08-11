@@ -2,40 +2,10 @@
 
 <div class="d-flex justify-content-end mb-3">
   <% if can? :create, Agendamento %>
-    <%= link_to "Novo agendamento",
-            new_agendamento_path,
-            class: "btn btn-primary",
-            data: { turbo_frame: "agendamento_modal", bs_toggle: "modal", bs_target: "#agendamentoModal" } %>
+    <%= link_to "Novo agendamento", new_agendamento_path, class: "btn btn-primary", data: { turbo_frame: "agendamento_modal", bs_toggle: "modal", bs_target: "#agendamentoModal" } %>
   <% end %>
 </div>
 
-<div id="agendamentos_table" class="tab-panel">
-  <table class="table table-striped m-t">
-    <thead>
-      <tr>
-        <th>Data/Hora</th>
-        <th>Profissional</th>
-        <th>Serviço</th>
-        <th>Status</th>
-        <th width="180"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @agendamentos.each do |a| %>
-        <tr>
-          <td><%= l a.horario, format: :short %></td>
-          <td><%= a.funcionario&.nome || a.funcionario_id %></td>
-          <td><%= a.servico&.nome %></td>
-          <td><%= status_label(a.status) %></td>
-          <td class="text-right">
-            <div class="btn-group" role="group">
-              <%= link_to "Ver", agendamento_path(a), class: "btn btn-xs btn-default" %>
-              <%= link_to "Editar", edit_agendamento_path(a), class: "btn btn-xs btn-warning", data: { turbo_frame: "agendamento_modal", bs_toggle: "modal", bs_target: "#agendamentoModal" } %>
-              <%= link_to "Excluir", a, method: :delete, data: { confirm: "Confirma remover?" }, class: "btn btn-xs btn-danger" if can?(:destroy, a) %>
-            </div>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+<div id="agendamentos_table">
+  <%= render "agendamentos/agendamentos_table", agendamentos: @agendamentos %>
 </div>

@@ -1,0 +1,19 @@
+<div class="tab-content pt-3" id="agendamentoTabsContent">
+  <!-- Cliente -->
+  <% if current_usuario.cliente? %>
+    <%= f.hidden_field :cliente_id, value: current_usuario.id %>
+    <p><strong>Cliente:</strong> <%= current_usuario.nome %></p>
+  <% else %>
+    <%= f.text_field :nome_cliente_convidado, placeholder: "Nome do Cliente", class: "form-control" %>
+  <% end %>
+
+  <!-- Profissional & Serviço -->
+  <%= f.collection_select :funcionario_id, Usuario.funcionario.order(:nome), :id, :nome, include_blank: "Selecione" %>
+  <%= f.collection_select :servico_id, (@servicos || Servico).order(:nome), :id, :nome, include_blank: "Selecione" %>
+
+  <!-- Data & Horário -->
+  <%= date_field_tag :data, params[:data] || Date.current, min: Date.current, class: "form-control" %>
+  <turbo-frame id="horarios-frame">
+    <div class="text-muted">Escolha profissional, serviço e data...</div>
+  </turbo-frame>
+</div>

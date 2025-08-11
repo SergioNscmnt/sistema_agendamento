@@ -1,25 +1,28 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  static targets = ["frame"]
+
   connect() {
-    // Abre o modal quando o conteúdo chega no frame
-    this.modal = bootstrap.Modal.getOrCreateInstance(this.element)
-    this.modal.show()
+    this.bs = window.bootstrap?.Modal.getOrCreateInstance(this.element)
 
-    // Se o form renderizar novamente (422), manter aberto
-    this.element.addEventListener("turbo:submit-end", (e) => {
-      const ok = e.detail.success
-      if (ok) this.modal.hide()
+    // Abre quando o frame terminar de carregar o form
+    this.element.addEventListener("turbo:frame-load", (e) => {
+      if (e.target === this.frameTarget) this.bs?.show()
     })
 
-    // Ao fechar, limpa o frame (pra não reaparecer em navegações Turbo)
-    this.element.addEventListener("hidden.bs.modal", () => {
-      const frame = document.querySelector("#agendamento_modal")
-      if (frame) frame.innerHTML = ""
+    // Fecha quando esvaziamos o frame via turbo_stream.update("agendamento_modal", "")
+    this.element.addEventListener("turbo:before-frame-render", (e) => {
+      if (e.target === this.frameTarget && e.detail.newFrame.innerHTML.trim() === "") {
+        this.bs?.hide()
+      }
     })
   }
 
-  close() {
-    this.modal?.hide()
+  // fallback: abrir já no clique (para feedback imediato)
+  open() {
+    this.bs?.show()
   }
+
+  close() { this.bs?.hide() }
 }

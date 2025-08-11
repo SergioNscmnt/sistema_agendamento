@@ -6,7 +6,7 @@ class HorarioFuncionario < ApplicationRecord
   enum dia_da_semana: {
     domingo: 0,
     segunda: 1,
-    terca:   2,  # sem cedilha para chave do enum
+    terca:   2,
     quarta:  3,
     quinta:  4,
     sexta:   5,

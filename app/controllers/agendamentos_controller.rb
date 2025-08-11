@@ -4,35 +4,51 @@ class AgendamentosController < ApplicationController
   before_action :set_collections, only: [:new, :edit, :create, :update]
 
   def index
-    @agendamentos = Agendamento.new
-    render layout: false if turbo_frame_request?
+    @agendamentos = Agendamento
+                    .accessible_by(current_ability)
+                    .includes(:servico, :funcionario)
+                    .order(horario: :asc)
   end
 
   def new
-     @agendamento = Agendamento.new
-     render partial: "agendamentos/modal", locals: { agendamento: @agendamento }, layout: false if turbo_frame_request?
+    debugger
+    @agendamento = Agendamento.new
+    set_collections
+    if turbo_frame_request?
+      render partial: "agendamentos/modal_frame",
+             locals: { agendamento: @agendamento },
+             layout: false
+    end
   end
 
   def create
     @agendamento = Agendamento.new(agendamento_params_for_role)
 
     if @agendamento.save
+      scope = Agendamento.accessible_by(current_ability).includes(:servico, :funcionario).order(:horario)
       respond_to do |format|
         format.turbo_stream do
-          flash.now[:notice] = "Agendamento criado com sucesso."
           render turbo_stream: [
-            turbo_stream.replace(
-              "agendamentos_table",
-              partial: "agendamentos/table",
-              locals: { agendamentos: Agendamento.accessible_by(current_ability).order(:horario) }
+            turbo_stream.replace("agendamentos_table",
+              partial: "agendamentos/agendamentos_table",
+              locals: { agendamentos: Agendamento.accessible_by(current_ability).includes(:servico, :funcionario).order(:horario) }
             ),
-            turbo_stream.update("agendamento_modal", "") # limpa o frame => fecha pelo controller
+            turbo_stream.update("agendamento_modal", "")
           ]
         end
         format.html { redirect_to agendamentos_path, notice: "Agendamento criado com sucesso." }
       end
     else
-      render partial: "agendamentos/modal", locals: { agendamento: @agendamento }, status: :unprocessable_entity
+      respond_to do |format|
+        format.turbo_stream do
+          set_collections
+          render partial: "agendamentos/form", locals: { agendamento: @agendamento }, status: :unprocessable_entity, layout: false
+        end
+        format.html do
+          @agendamentos = Agendamento.accessible_by(current_ability).includes(:servico, :funcionario).order(:horario)
+          render :index, status: :unprocessable_entity
+        end
+      end
     end
   end
 
@@ -41,19 +57,24 @@ class AgendamentosController < ApplicationController
   end
 
   def edit
-    render partial: "agendamentos/modal", locals: { agendamento: @agendamento }, layout: false if turbo_frame_request?
+    set_collections
+    if turbo_frame_request?
+      render partial: "agendamentos/modal_frame",
+             locals: { agendamento: @agendamento },
+             layout: false
+    end
   end
 
+  
   def update
     if @agendamento.update(agendamento_params_for_role)
+      scope = Agendamento.accessible_by(current_ability).includes(:servico, :funcionario).order(:horario)
       respond_to do |format|
         format.turbo_stream do
-          flash.now[:notice] = "Agendamento atualizado."
           render turbo_stream: [
-            turbo_stream.replace(
-              "agendamentos_table",
-              partial: "agendamentos/table",
-              locals: { agendamentos: Agendamento.accessible_by(current_ability).order(:horario) }
+            turbo_stream.replace("agendamentos_table",
+              partial: "agendamentos/agendamentos_table",
+              locals: { agendamentos: Agendamento.accessible_by(current_ability).includes(:servico, :funcionario).order(:horario) }
             ),
             turbo_stream.update("agendamento_modal", "")
           ]
@@ -61,7 +82,16 @@ class AgendamentosController < ApplicationController
         format.html { redirect_to agendamentos_path, notice: "Agendamento atualizado." }
       end
     else
-      render partial: "agendamentos/modal", locals: { agendamento: @agendamento }, status: :unprocessable_entity
+      respond_to do |format|
+        format.turbo_stream do
+          set_collections
+          render partial: "agendamentos/form", locals: { agendamento: @agendamento }, status: :unprocessable_entity, layout: false
+        end
+        format.html do
+          @agendamentos = Agendamento.accessible_by(current_ability).includes(:servico, :funcionario).order(:horario)
+          render :index, status: :unprocessable_entity
+        end
+      end
     end
   end
 
@@ -131,7 +161,7 @@ class AgendamentosController < ApplicationController
 
     @disponiveis = disponiveis
 
-    render :novos_horarios
+    render partial: "agendamentos/horarios_disponiveis", locals: { disponiveis: @disponiveis }
   end
 
   private
